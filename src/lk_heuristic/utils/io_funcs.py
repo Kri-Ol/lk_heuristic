@@ -1,15 +1,17 @@
 import logging
+
 from lk_heuristic.models.node import Node2D, Node3D
+
+import tsplib95
 
 # create a logger object
 logger = logging.getLogger(__name__)
 
-
-def import_tsp_file(tsp_file):
+def import_tsp_file(tsp_file: str):
     """
     Import a .tsp file containing tsp definition and parse tsp header to a dictionary and tsp nodes to a list. Returns both objects in a tuple.
 
-    *This function only works for .tsp instances of "TYPE" = TSP (simmetric tsp) and for "EDGE_WEIGH_TYPE" = EUC_2D or EUC_3D, which are the tsp problems that solver can handle currently.
+    *This function only works for .tsp instances of "TYPE" = TSP (symmetric tsp) and for "EDGE_WEIGH_TYPE" = EUC_2D or EUC_3D, which are the tsp problems that solver can handle currently.
 
     :param tsp_file: the .tsp file path
     :type tsp_file: str
@@ -19,7 +21,7 @@ def import_tsp_file(tsp_file):
 
     # set the allowed type and edge weight for tsp
     allowed_types = ["TSP"]
-    allowed_edge_weights = ["EUC_2D", "EUC_3D"]
+    allowed_edge_weights = ["EUC_2D", "EUC_3D", "EXPLICIT"]
 
     # return objects
     tsp_header = {}  # the .tsp header dict to be returned by the function
@@ -27,6 +29,7 @@ def import_tsp_file(tsp_file):
 
     # a boolean value to be changed when node coord section is reached
     is_node_section = False
+    is_edge_weights_section = False
 
     # try to execute the import
     try:
@@ -57,6 +60,8 @@ def import_tsp_file(tsp_file):
                                 nodes.append(Node2D(float(coords[1]), float(coords[2])))
                             elif tsp_header["EDGE_WEIGHT_TYPE"] == "EUC_3D":
                                 nodes.append(Node3D(float(coords[1]), float(coords[2]), float(coords[3])))
+                            elif tsp_header["EDGE_WEIGHT_TYPE"] == "EXPLICIT": # explicit should be always 3d, put 0 for 2D cases
+                                nodes.append(Node3D(float(coords[1]), float(coords[2]), float(coords[3])))
 
                 # try to collect .tsp attributes
                 else:
@@ -64,6 +69,8 @@ def import_tsp_file(tsp_file):
                     # add node coord section into dict
                     if line.strip() == "NODE_COORD_SECTION":
                         is_node_section = True
+
+                    if line.strip() == EDGE_WEIGHT_SECTION
 
                     # split the line using ":" to get header attributes
                     line_split = line.split(":")
