@@ -2,6 +2,7 @@ import os
 import logging
 import math
 import time
+
 from lk_heuristic.models.tsp import Tsp
 from lk_heuristic.utils.cost_funcs import cost_funcs
 from lk_heuristic.utils.io_funcs import import_tsp_file, export_tsp_file
@@ -78,7 +79,7 @@ def get_interactive_inputs():
 
 def solve(tsp_file=None, solution_method=None, runs=1, backtracking=(5, 5), reduction_level=4, reduction_cycle=4, file_name=None, logging_level=logging.DEBUG):
     """
-    Solve a specific tsp problem a certain amount of times using the tsp_file input and the desired solution method. If this functions is called with no supplied inputs, the interactive inputs will be collected through the terminal. The best solution is parsed to .tsp file and exported to solution folder. 
+    Solve a specific tsp problem a certain amount of times using the tsp_file input and the desired solution method. If this functions is called with no supplied inputs, the interactive inputs will be collected through the terminal. The best solution is parsed to .tsp file and exported to solution folder.
 
     :param tsp_file: the .tsp file to be solved
     :type tsp_file: str

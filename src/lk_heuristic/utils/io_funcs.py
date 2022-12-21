@@ -70,7 +70,8 @@ def import_tsp_file(tsp_file: str):
                     if line.strip() == "NODE_COORD_SECTION":
                         is_node_section = True
 
-                    if line.strip() == EDGE_WEIGHT_SECTION
+                    if line.strip() == "EDGE_WEIGHT_SECTION":
+                        is_edge_weights_section = True
 
                     # split the line using ":" to get header attributes
                     line_split = line.split(":")
@@ -84,6 +85,10 @@ def import_tsp_file(tsp_file: str):
     # print error to user
     except Exception as e:
         logger.error(f"Error during import of .tsp file: '{e}'")
+
+    problem = tsplib95.loaders.load(tsp_file)
+
+
 
     # return the .tsp dict and node values
     return tsp_header, nodes
