@@ -25,69 +25,21 @@ def import_tsp_file(tsp_file: str):
 
     # return objects
     tsp_header = {}  # the .tsp header dict to be returned by the function
-    nodes = []  # the list of nodes to be parsed from node coord section
-
-    # a boolean value to be changed when node coord section is reached
-    is_node_section = False
-    is_edge_weights_section = False
-
-    # try to execute the import
-    try:
-
-        # open tsp file
-        with open(tsp_file, "r+") as f:
-
-            # read all tsp file lines
-            tsp_lines = f.readlines()
-
-            # loop through each tsp line
-            for line in tsp_lines:
-
-                # checking if coord section was already reached
-                if is_node_section:
-
-                    # check if problem is tsp (simmetric tsp) and edge_weight is either euc_2d or euc_3d
-                    if tsp_header["TYPE"] in allowed_types and tsp_header["EDGE_WEIGHT_TYPE"] in allowed_edge_weights:
-
-                        # check if line is not last end-of-file line
-                        if line.strip() != "EOF":
-
-                            # split the line using space separator
-                            coords = line.replace("\n", "").split()
-
-                            # create a node using node coord values and append it to list
-                            if tsp_header["EDGE_WEIGHT_TYPE"] == "EUC_2D":
-                                nodes.append(Node2D(float(coords[1]), float(coords[2])))
-                            elif tsp_header["EDGE_WEIGHT_TYPE"] == "EUC_3D":
-                                nodes.append(Node3D(float(coords[1]), float(coords[2]), float(coords[3])))
-                            elif tsp_header["EDGE_WEIGHT_TYPE"] == "EXPLICIT": # explicit should be always 3d, put 0 for 2D cases
-                                nodes.append(Node3D(float(coords[1]), float(coords[2]), float(coords[3])))
-
-                # try to collect .tsp attributes
-                else:
-
-                    # add node coord section into dict
-                    if line.strip() == "NODE_COORD_SECTION":
-                        is_node_section = True
-
-                    if line.strip() == "EDGE_WEIGHT_SECTION":
-                        is_edge_weights_section = True
-
-                    # split the line using ":" to get header attributes
-                    line_split = line.split(":")
-
-                    # check if split was made
-                    if len(line_split) == 2:
-
-                        # assign dict values
-                        tsp_header[line_split[0].strip()] = line_split[1].strip()
-
-    # print error to user
-    except Exception as e:
-        logger.error(f"Error during import of .tsp file: '{e}'")
+    nodes = []       # the list of nodes to be parsed from node coord section
 
     problem = tsplib95.loaders.load(tsp_file)
 
+    kw_dict = problem.as_keyword_dict()
+
+    if not kw_dict['TYPE'] in  allowed_types:
+        return None, None, "Not a TSP type problem"
+
+    for k,v in kw_dict.items():
+        if k == "NODES":
+            break
+        tsp_header[k] = v
+
+    for k,v in kw_dict.items():
 
 
     # return the .tsp dict and node values
