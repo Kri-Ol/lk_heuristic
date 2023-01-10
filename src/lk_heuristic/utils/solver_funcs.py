@@ -1,10 +1,12 @@
 import os
+import sys
 import logging
 import math
 import time
 
 from lk_heuristic.models.tsp import Tsp
 from lk_heuristic.utils.cost_funcs import cost_funcs
+from lk_heuristic.models.node import Node2D
 from lk_heuristic.utils.io_funcs import import_tsp_file, export_tsp_file
 
 # get the directory of this file and setup the "samples" and "solutions" dir
@@ -76,6 +78,7 @@ def get_interactive_inputs():
     # returns the tsp file and solution method
     return (tsp_file, solution_method)
 
+distmatrix = None
 
 def solve(tsp_file=None, solution_method=None, runs=1, backtracking=(5, 5), reduction_level=4, reduction_cycle=4, file_name=None, logging_level=logging.DEBUG):
     """
@@ -99,6 +102,8 @@ def solve(tsp_file=None, solution_method=None, runs=1, backtracking=(5, 5), redu
     :type logging_level: int
     """
 
+    global distmatrix
+
     # get interactive inputs if input is not supplied at function
     if not (tsp_file or solution_method):
         tsp_file, solution_method = get_interactive_inputs()
@@ -109,7 +114,16 @@ def solve(tsp_file=None, solution_method=None, runs=1, backtracking=(5, 5), redu
 
     # parse the .tsp file
     logger.info(f"Importing .tsp file '{os.path.basename(tsp_file)}'")
-    tsp_header, tsp_nodes = import_tsp_file(tsp_file)
+    tsp_header, tsp_nodes, parerrstr = import_tsp_file(tsp_file)
+    if tsp_header is None and tsp_nodes is None:
+        logger.error(f"Error parsing input TSP: {parerrstr}")
+        sys.exit(1)
+
+    if tsp_header['EDGE_WEIGHT_TYPE'] in ["EXPLICIT"]:
+        distmatrix = tsp_nodes
+        tsp_nodes = []
+        for k in range(0, len(distmatrix)):
+            tsp_nodes.append(Node2D(k, k))
 
     # get the cost function
     cost_function = cost_funcs[tsp_header["EDGE_WEIGHT_TYPE"]]

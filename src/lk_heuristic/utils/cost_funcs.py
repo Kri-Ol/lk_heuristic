@@ -25,7 +25,7 @@ def euc_3d(n1, n2) -> float:
     """
     return ((n1.x - n2.x)**2 + (n1.y - n2.y)**2 + (n1.z - n2.z)**2)**0.5
 
-def full_matrix(n1, n2, mtx) -> float:
+def full_matrix(n1, n2) -> float:
     """
     The external distance for 3D cartesian nodes
 
@@ -39,7 +39,9 @@ def full_matrix(n1, n2, mtx) -> float:
     :rtype: float
     """
 
-    return 1.0
+    global distmatrix
+
+    return distmatrix[n1.x][n2.x]
 
 # a dictionary mapping tsp lib edge weight type with respective cost function
 cost_funcs = {"EUC_2D": euc_2d,

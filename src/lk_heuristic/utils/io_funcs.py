@@ -1,17 +1,18 @@
 import logging
+import tsplib95
 
 from lk_heuristic.models.node import Node2D, Node3D
-
-import tsplib95
 
 # create a logger object
 logger = logging.getLogger(__name__)
 
 def import_tsp_file(tsp_file: str):
     """
-    Import a .tsp file containing tsp definition and parse tsp header to a dictionary and tsp nodes to a list. Returns both objects in a tuple.
+    Import a .tsp file containing tsp definition and parse tsp header to a dictionary and tsp nodes to a list.
+    Returns both objects in a tuple.
 
-    *This function only works for .tsp instances of "TYPE" = TSP (symmetric tsp) and for "EDGE_WEIGH_TYPE" = EUC_2D or EUC_3D, which are the tsp problems that solver can handle currently.
+    *This function only works for .tsp instances of "TYPE" = TSP (symmetric tsp),
+    and for "EDGE_WEIGH_TYPE" = EUC_2D, EUC_3D or EXPLICIT, which are the tsp problems that solver can handle currently.
 
     :param tsp_file: the .tsp file path
     :type tsp_file: str
@@ -23,27 +24,36 @@ def import_tsp_file(tsp_file: str):
     allowed_types = ["TSP"]
     allowed_edge_weights = ["EUC_2D", "EUC_3D", "EXPLICIT"]
 
-    # return objects
-    tsp_header = {}  # the .tsp header dict to be returned by the function
-    nodes = []       # the list of nodes to be parsed from node coord section
-
     problem = tsplib95.loaders.load(tsp_file)
 
     kw_dict = problem.as_keyword_dict()
 
     if not kw_dict['TYPE'] in  allowed_types:
-        return None, None, "Not a TSP type problem"
+        return None, None, 'Not a sym TSP type problem'
 
-    for k,v in kw_dict.items():
-        if k == "NODES":
-            break
-        tsp_header[k] = v
+    if not kw_dict['EDGE_WEIGHT_TYPE'] in allowed_edge_weights:
+        wdtype = kw_dict['EDGE_WEIGHT_TYPE']
+        return None, None, f'Unsupported EDGE_WEIGHT_TYPE: {wdtype}'
 
-    for k,v in kw_dict.items():
+    nodes = None
+    if kw_dict['EDGE_WEIGHT_TYPE'] in ["EUC_2D"]:
+        nodes = [] # the list of nodes to be parsed from node coord section
+        nds = kw_dict['NODE_COORD_SECTION']
+        for idx, nd in nds.items():
+            nodes.append(Node2D(nd[0], nd[1]))
 
+    elif kw_dict['EDGE_WEIGHT_TYPE'] in ["EUC_3D"]:
+        nodes = [] # the list of nodes to be parsed from node coord section
+        nds = kw_dict['NODE_COORD_SECTION']
+        for idx, nd in nds.items():
+            nodes.append(Node3D(nd[0], nd[1], nd[2]))
+
+    elif kw_dict['EDGE_WEIGHT_TYPE'] in ["EXPLICIT"]:
+        if kw_dict['NODE_COORD_TYPE'] in ['NO_COORDS']:
+            nodes = kw_dict['EDGE_WEIGHT_SECTION']
 
     # return the .tsp dict and node values
-    return tsp_header, nodes
+    return kw_dict, nodes, ''
 
 
 def export_tsp_file(tsp_file_path, tsp_header, nodes):
