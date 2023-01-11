@@ -1,3 +1,5 @@
+import lk_heuristic.utils.globals
+
 def euc_2d(n1, n2) -> float:
     """
     The euclidean distance for 2D cartesian nodes
@@ -27,21 +29,16 @@ def euc_3d(n1, n2) -> float:
 
 def full_matrix(n1, n2) -> float:
     """
-    The external distance for 3D cartesian nodes
+    The external distance via explicit full matrix
 
     :param n1: first node
-    :type n1: Node3D
+    :type n1: Node2D
     :param n2: second node
-    :type n2: Node3D
-    :param mtx: distance full matrix
-    :type mtx: matrix
+    :type n2: Node2D
     :return: the distance between first node and second node in 3D space, from full matrix
     :rtype: float
     """
-
-    global distmatrix
-
-    return distmatrix[n1.x][n2.x]
+    return lk_heuristic.utils.globals.distmatrix[n1.x][n2.x]
 
 # a dictionary mapping tsp lib edge weight type with respective cost function
 cost_funcs = {"EUC_2D": euc_2d,

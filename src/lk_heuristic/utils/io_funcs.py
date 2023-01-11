@@ -1,6 +1,8 @@
 import logging
 import tsplib95
 
+import lk_heuristic.utils.globals
+
 from lk_heuristic.models.node import Node2D, Node3D
 
 # create a logger object
@@ -39,18 +41,22 @@ def import_tsp_file(tsp_file: str):
     if kw_dict['EDGE_WEIGHT_TYPE'] in ["EUC_2D"]:
         nodes = [] # the list of nodes to be parsed from node coord section
         nds = kw_dict['NODE_COORD_SECTION']
-        for idx, nd in nds.items():
+        for _, nd in nds.items():
             nodes.append(Node2D(nd[0], nd[1]))
 
     elif kw_dict['EDGE_WEIGHT_TYPE'] in ["EUC_3D"]:
         nodes = [] # the list of nodes to be parsed from node coord section
         nds = kw_dict['NODE_COORD_SECTION']
-        for idx, nd in nds.items():
+        for _, nd in nds.items():
             nodes.append(Node3D(nd[0], nd[1], nd[2]))
 
     elif kw_dict['EDGE_WEIGHT_TYPE'] in ["EXPLICIT"]:
         if kw_dict['NODE_COORD_TYPE'] in ['NO_COORDS']:
-            nodes = kw_dict['EDGE_WEIGHT_SECTION']
+            if kw_dict['EDGE_WEIGHT_FORMAT'] in ['FULL_MATRIX']:
+                lk_heuristic.utils.globals.distmatrix = kw_dict['EDGE_WEIGHT_SECTION']
+                nodes = []
+                for k in range(0, len(lk_heuristic.utils.globals.distmatrix)): # nodes here are just indices
+                    nodes.append(Node2D(k, k))
 
     # return the .tsp dict and node values
     return kw_dict, nodes, ''

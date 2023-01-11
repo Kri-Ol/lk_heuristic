@@ -4,6 +4,8 @@ import logging
 import math
 import time
 
+import lk_heuristic.utils.globals
+
 from lk_heuristic.models.tsp import Tsp
 from lk_heuristic.utils.cost_funcs import cost_funcs
 from lk_heuristic.models.node import Node2D
@@ -13,7 +15,6 @@ from lk_heuristic.utils.io_funcs import import_tsp_file, export_tsp_file
 file_dir = os.path.dirname(os.path.realpath(__file__))
 samples_dir = os.path.abspath(os.path.join(file_dir, "../", "samples"))
 solutions_dir = os.path.abspath(os.path.join(file_dir, "../", "solutions"))
-
 
 def get_interactive_inputs():
     """
@@ -78,8 +79,6 @@ def get_interactive_inputs():
     # returns the tsp file and solution method
     return (tsp_file, solution_method)
 
-distmatrix = None
-
 def solve(tsp_file=None, solution_method=None, runs=1, backtracking=(5, 5), reduction_level=4, reduction_cycle=4, file_name=None, logging_level=logging.DEBUG):
     """
     Solve a specific tsp problem a certain amount of times using the tsp_file input and the desired solution method. If this functions is called with no supplied inputs, the interactive inputs will be collected through the terminal. The best solution is parsed to .tsp file and exported to solution folder.
@@ -102,8 +101,6 @@ def solve(tsp_file=None, solution_method=None, runs=1, backtracking=(5, 5), redu
     :type logging_level: int
     """
 
-    global distmatrix
-
     # get interactive inputs if input is not supplied at function
     if not (tsp_file or solution_method):
         tsp_file, solution_method = get_interactive_inputs()
@@ -118,12 +115,6 @@ def solve(tsp_file=None, solution_method=None, runs=1, backtracking=(5, 5), redu
     if tsp_header is None and tsp_nodes is None:
         logger.error(f"Error parsing input TSP: {parerrstr}")
         sys.exit(1)
-
-    if tsp_header['EDGE_WEIGHT_TYPE'] in ["EXPLICIT"]:
-        distmatrix = tsp_nodes
-        tsp_nodes = []
-        for k in range(0, len(distmatrix)):
-            tsp_nodes.append(Node2D(k, k))
 
     # get the cost function
     cost_function = cost_funcs[tsp_header["EDGE_WEIGHT_TYPE"]]
