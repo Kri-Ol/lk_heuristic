@@ -31,9 +31,9 @@ def full_matrix(n1, n2) -> float:
     """
     The external distance via explicit full matrix
 
-    :param n1: first node
+    :param n1: first node, used as matrix index
     :type n1: Node2D
-    :param n2: second node
+    :param n2: second node, used as matrix index
     :type n2: Node2D
     :return: the distance between first node and second node in 3D space, from full matrix
     :rtype: float

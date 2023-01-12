@@ -76,7 +76,7 @@ def export_tsp_file(tsp_file_path, tsp_header, nodes):
 
     # try to execute the export
     try:
-
+        tsp_header.pop('NODE_COORD_SECTION', None) # remove if already exists
         # create tsp file to write data
         with open(tsp_file_path, "w+") as f:
 

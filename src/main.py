@@ -5,7 +5,7 @@ print('start')
 
 # tsp_file="C:/Users/kriol/Source/Repos/LKHWin-2.0.10/lk_heuristic/src/lk_heuristic/samples/a280.tsp",
 # tsp_file="C:/Users/kriol/Documents/Python/lk_heuristic/src/lk_heuristic/samples/a280.tsp"
-solve(tsp_file="C:/Users/kriol/Source/Repos/LKHWin-2.0.10/lk_heuristic/src/lk_heuristic/samples/explicit.tsp",
+solve(tsp_file="C:/Users/kriol/Documents/Python/lk_heuristic/src/lk_heuristic/samples/a280.tsp",
       solution_method="lk2_improve",
       runs=50,
       backtracking=(5, 5),
